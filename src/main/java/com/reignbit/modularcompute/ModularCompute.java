@@ -1,6 +1,7 @@
 package com.reignbit.modularcompute;
 
 import com.mojang.logging.LogUtils;
+import com.reignbit.modularcompute.blockentity.ComputerTestBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,23 +35,18 @@ import org.slf4j.Logger;
 public class ModularCompute
 {
     public static final String MOD_ID = "modularcompute";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
-
-    public static final RegistryObject<Block> COMPUTER_TEST_BLOCK = BLOCKS.register("test_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
-    // Creates a new BlockItem with the id "examplemod:example_block", combining the namespace and path
-    public static final RegistryObject<Item> COMPUTER_TEST_BLOCK_ITEM = ITEMS.register("test_block", () -> new BlockItem(COMPUTER_TEST_BLOCK.get(), new Item.Properties()));
 
 
 
     public static final RegistryObject<CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("creative_tab", () -> CreativeModeTab.builder()
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> COMPUTER_TEST_BLOCK_ITEM.get().getDefaultInstance())
+            .icon(() -> ModItems.COMPUTER.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(COMPUTER_TEST_BLOCK_ITEM.get());
+                output.accept(ModItems.COMPUTER.get());
             }).build());
 
     public ModularCompute(FMLJavaModLoadingContext context)
@@ -60,9 +57,10 @@ public class ModularCompute
         modEventBus.addListener(this::commonSetup);
 
         // Register our... registers, heh
-        BLOCKS.register(modEventBus);
-        ITEMS.register(modEventBus);
+        ModBlocks.BLOCKS.register(modEventBus);
+        ModItems.ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
+        ModBlockEntities.ENTITIES.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
